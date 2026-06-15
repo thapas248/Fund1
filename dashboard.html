@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Fund1 Data Driven Demo</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{background:#0B1020;color:white;font-family:Arial;padding:20px}
+.card{background:#1A2238;padding:15px;border-radius:16px;display:inline-block;margin-right:10px;min-width:150px}
+canvas{background:#1A2238;border-radius:16px;padding:20px;margin-top:20px}
+</style>
+</head>
+<body>
+<h1>Fund1</h1>
+
+<div class="card"><div>Fund1</div><h2 id="fundRet">-</h2></div>
+<div class="card"><div>IMPI</div><h2 id="impiRet">-</h2></div>
+<div class="card"><div>Alpha</div><h2 id="alpha">-</h2></div>
+
+<canvas id="chart" height="120"></canvas>
+
+<script>
+Promise.all([
+fetch('data/portfolio_history.json').then(r=>r.json()),
+fetch('data/impi_history.json').then(r=>r.json())
+]).then(([portfolio, impi])=>{
+
+const pLast=portfolio[portfolio.length-1].value;
+const iLast=impi[impi.length-1].value;
+
+document.getElementById('fundRet').innerText=((pLast-100).toFixed(1))+'%';
+document.getElementById('impiRet').innerText=((iLast-100).toFixed(1))+'%';
+document.getElementById('alpha').innerText=((pLast-iLast).toFixed(1))+'%';
+
+new Chart(document.getElementById('chart'),{
+type:'line',
+data:{
+labels:portfolio.map(x=>x.date),
+datasets:[
+{label:'Fund1',data:portfolio.map(x=>x.value)},
+{label:'IMPI',data:impi.map(x=>x.value)}
+]
+}
+});
+});
+</script>
+</body>
+</html>

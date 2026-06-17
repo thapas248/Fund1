@@ -1,49 +1,50 @@
+<!DOCTYPE html><html><head><title>Fund1</title>
+<link rel='stylesheet' href='css/theme.css'>
+<script src='https://cdn.jsdelivr.net/npm/chart.js'></script></head><body>
 
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Fund1 Data Driven Demo</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-body{background:#0B1020;color:white;font-family:Arial;padding:20px}
-.card{background:#1A2238;padding:15px;border-radius:16px;display:inline-block;margin-right:10px;min-width:150px}
-canvas{background:#1A2238;border-radius:16px;padding:20px;margin-top:20px}
-</style>
-</head>
-<body>
-<h1>Fund1</h1>
+<div id='sidebar' class='sidebar'>
+<h2>Fund1</h2>
+<a href='index.html'>🏠 Dashboard</a>
+<a href='benchmark.html'>📊 Benchmark</a>
+<hr>
+<a href='portfolio.html'>💼 Portfolio</a>
+<a href='journal.html'>📝 Journal</a>
+<a href='admin.html'>⚙ Admin</a>
+</div>
+<div class='topbar'>
+<button class='menu-btn' onclick='toggleSidebar()'>☰</button>
+<div><div class='brand'>Fund1</div><div class='subtitle'>Actively managed portfolio benchmarked against IMPI</div></div>
+</div>
 
-<div class="card"><div>Fund1</div><h2 id="fundRet">-</h2></div>
-<div class="card"><div>IMPI</div><h2 id="impiRet">-</h2></div>
-<div class="card"><div>Alpha</div><h2 id="alpha">-</h2></div>
-
-<canvas id="chart" height="120"></canvas>
-
+<div class='main'>
+<div class='cards'>
+<div class='card'><div>Fund1 NAV</div><h2 id='fundNav'>-</h2></div>
+<div class='card'><div>IMPI Level</div><h2 id='impiNav'>-</h2></div>
+<div class='card'><div>Alpha</div><h2 id='alpha'>-</h2></div>
+</div>
+<div class='chart-card'><canvas id='chart'></canvas></div>
+<p class='small' id='updated'></p>
+</div>
+<script src='js/common.js'></script>
 <script>
 Promise.all([
 fetch('data/portfolio_history.json').then(r=>r.json()),
 fetch('data/impi_history.json').then(r=>r.json())
-]).then(([portfolio, impi])=>{
-
-const pLast=portfolio[portfolio.length-1].value;
-const iLast=impi[impi.length-1].value;
-
-document.getElementById('fundRet').innerText=((pLast-100).toFixed(1))+'%';
-document.getElementById('impiRet').innerText=((iLast-100).toFixed(1))+'%';
-document.getElementById('alpha').innerText=((pLast-iLast).toFixed(1))+'%';
-
+]).then(([p,i])=>{
+let pf=p[p.length-1].value;
+let im=i[i.length-1].value;
+document.getElementById('fundNav').innerText=pf.toFixed(2);
+document.getElementById('impiNav').innerText=im.toFixed(2);
+document.getElementById('alpha').innerText=(pf-im).toFixed(2);
+document.getElementById('updated').innerText='Last Updated: '+p[p.length-1].date;
 new Chart(document.getElementById('chart'),{
 type:'line',
 data:{
-labels:portfolio.map(x=>x.date),
+labels:p.map(x=>x.date),
 datasets:[
-{label:'Fund1',data:portfolio.map(x=>x.value)},
-{label:'IMPI',data:impi.map(x=>x.value)}
-]
-}
+{label:'Fund1',data:p.map(x=>x.value)},
+{label:'IMPI',data:i.map(x=>x.value)}
+] }
 });
 });
-</script>
-</body>
-</html>
+</script></body></html>
